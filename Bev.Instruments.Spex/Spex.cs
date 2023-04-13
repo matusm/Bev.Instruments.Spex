@@ -1,6 +1,5 @@
-﻿using System;
-using System.Threading;
-using Bev.IO.Gpib;
+﻿using System.Threading;
+using Bev.IO.RemoteInterface;
 
 namespace Bev.Instruments.Spex
 {
@@ -40,15 +39,15 @@ namespace Bev.Instruments.Spex
         }
         #endregion
 
-        public Spex(int deviceAddress, IGpibHandler gpibHandler)
+        public Spex(int deviceAddress, IRemoteInterface remoteHandler)
         {
             DeviceAddress = deviceAddress;
-            GpibHandler = gpibHandler;
+            RemoteHandler = remoteHandler;
             wlConv = new WavelengthConverter();
             Initialize();
         }
 
-        public IGpibHandler GpibHandler { get; }
+        public IRemoteInterface RemoteHandler { get; }
         public int DeviceAddress { get; }
         public string InstrumentManufacturer => "Jobin-Yvon / SPEX";
         public string InstrumentType => GetInstrumentType();
@@ -130,7 +129,7 @@ namespace Bev.Instruments.Spex
 
         private void Initialize()
         {
-            GpibHandler.Remote(DeviceAddress);
+            RemoteHandler.Remote(DeviceAddress);
             OutputEnter(" ", 200);
             StartMainProgram();
         }
@@ -143,9 +142,9 @@ namespace Bev.Instruments.Spex
 
         private string OutputEnter(string command, int delay)
         {
-            GpibHandler.Output(DeviceAddress, command);
+            RemoteHandler.Output(DeviceAddress, command);
             Thread.Sleep(delay);
-            return GpibHandler.Enter(DeviceAddress);
+            return RemoteHandler.Enter(DeviceAddress);
         }
 
         private string OutputEnter(string command) => OutputEnter(command, noDelay);

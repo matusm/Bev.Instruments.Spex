@@ -31,8 +31,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Bev.IO.Gpib">
-      <HintPath>..\..\Bev.IO.Gpib\bin\Release\Bev.IO.Gpib.dll</HintPath>
+    <Reference Include="Bev.IO.RemoteInterface">
+      <HintPath>..\..\Bev.IO.RemoteInterface\Bev.IO.RemoteInterface\bin\Release\Bev.IO.RemoteInterface.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
