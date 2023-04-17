@@ -12,7 +12,7 @@ namespace RS232Interface
         {
             comPort = new SerialPort(portName, 9600, Parity.None, 8, StopBits.One);
             comPort.Handshake = Handshake.None;
-            comPort.NewLine = "\r";
+            //comPort.NewLine = "\r";
             comPort.ReadTimeout = hugeDelay;
             comPort.WriteTimeout = hugeDelay;
             OpenPort();
@@ -38,7 +38,7 @@ namespace RS232Interface
         {
             try
             {
-                comPort.WriteLine(command);
+                comPort.Write(command);
                 Thread.Sleep(defaultDelay);
             }
             catch (TimeoutException)

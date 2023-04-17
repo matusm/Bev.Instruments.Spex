@@ -130,7 +130,9 @@ namespace Bev.Instruments.Spex
         private void Initialize()
         {
             RemoteHandler.Remote(DeviceAddress);
-            OutputEnter(" ", 200);
+            OutputEnter(" ", 2000);
+            OutputEnter(" ", 2000);
+            OutputEnter(" ", 2000);
             StartMainProgram();
         }
 
