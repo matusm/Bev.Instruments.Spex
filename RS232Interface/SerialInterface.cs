@@ -15,6 +15,8 @@ namespace RS232Interface
             //comPort.NewLine = "\r";
             comPort.ReadTimeout = hugeDelay;
             comPort.WriteTimeout = hugeDelay;
+            comPort.DtrEnable = true;
+            comPort.RtsEnable = false;
             OpenPort();
         }
 
