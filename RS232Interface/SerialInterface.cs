@@ -78,8 +78,8 @@ namespace RS232Interface
         private void NoOp() { }
 
         private readonly SerialPort comPort;
-        private const int defaultDelay = 100;   // in ms
-        private const int hugeDelay = 5000;     // in ms
+        private const int defaultDelay = 500;   // in ms
+        private const int hugeDelay = 8000;     // in ms
 
     }
 }
