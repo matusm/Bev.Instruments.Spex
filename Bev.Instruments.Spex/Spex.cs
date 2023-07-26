@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using Bev.IO.RemoteInterface;
 
 namespace Bev.Instruments.Spex
@@ -39,29 +40,35 @@ namespace Bev.Instruments.Spex
         }
         #endregion
 
-        public Spex(int deviceAddress, IRemoteInterface remoteHandler)
+        public Spex(int deviceAddress)
         {
-            DeviceAddress = deviceAddress;
-            RemoteHandler = remoteHandler;
+            interpreter = new SpexCommandInterpreter(deviceAddress);
             wlConv = new WavelengthConverter();
             Initialize();
         }
 
-        public IRemoteInterface RemoteHandler { get; }
-        public int DeviceAddress { get; }
+        public int DeviceAddress => interpreter.DeviceAddress;
+        public int CurrentPosition => GetCurrentStepPosition();
+        public WavelengthConverter WavelengthCalibration => wlConv;
         public string InstrumentManufacturer => "Jobin-Yvon / SPEX";
         public string InstrumentType => GetInstrumentType();
         public string InstrumentSerialNumber => GetDeviceSerialNumber();
         public string InstrumentFirmwareVersion => GetDeviceFirmwareVersion();
         public string InstrumentID => $"{InstrumentType} SN:{InstrumentSerialNumber} {InstrumentFirmwareVersion} @ {DeviceAddress:D2}";
 
-        public int GetPositionRaw()
+        public void SetCurrentStepPosition(int stepPosition)
         {
-            string str = StripFirstChar(OutputEnter("H0"));
+            interpreter.Send($"F0,{stepPosition}");
+            interpreter.ReadSingleCharacter();
+        }
+
+        public int GetCurrentStepPosition()
+        {
+            string str = interpreter.Query("H0");
             return int.TryParse(str, out int value) ? value : -1; // good old C++ error return value
         }
 
-        public void MoveRelativeRaw(int steps)
+        public void MoveRelativeSteps(int steps)
         {
             // TODO check for valid range
             if (steps == 0) return;
@@ -79,18 +86,24 @@ namespace Bev.Instruments.Spex
             }
         }
 
-        public void MoveAbsoluteRaw(int position)
+        public void MoveAbsoluteSteps(int position)
         {
-            int currentPos = GetPositionRaw();
+            int currentPos = GetCurrentStepPosition();
             int steps = position - currentPos;
-            MoveRelative(steps);
+            MoveRelativeWavelength(steps);
         }
 
-        public double GetPosition() => wlConv.StepsToWavelength(GetPositionRaw());
+        public double GetCurrentWavelength() => wlConv.StepsToWavelength(GetCurrentStepPosition());
 
-        public void MoveRelative(double wavelength) => MoveRelativeRaw(wlConv.WavelengthToSteps(wavelength));
+        public void MoveRelativeWavelength(double wavelength) => MoveRelativeSteps(wlConv.WavelengthToSteps(wavelength)); // this is wrong! (offset)
 
-        public void MoveAbsolute(double wavelength) => MoveAbsoluteRaw(wlConv.WavelengthToSteps(wavelength));
+        public void MoveAbsoluteWavelength(double wavelength) => MoveAbsoluteSteps(wlConv.WavelengthToSteps(wavelength));
+
+        public void MotorInit()
+        {
+            interpreter.Send("A");
+            interpreter.ReadSingleCharacter();
+        }
 
         private string GetInstrumentType()
         {
@@ -108,12 +121,15 @@ namespace Bev.Instruments.Spex
 
         private string GetDeviceFirmwareVersion()
         {
-            string zStr = StripFirstChar(OutputEnter("z"));
-            string yStr = StripFirstChar(OutputEnter("y"));
+            string zStr = interpreter.Query("z");
+            string yStr = interpreter.Query("y");
             return $"{zStr} - {yStr}";
         }
 
-        private void MoveRelativeGeneric(int steps) => OutputEnter($"F0,{steps}");
+        private void MoveRelativeGeneric(int steps)
+        {
+            interpreter.Query($"F0,{steps}");
+        }
 
         private void ReturnOnHalt()
         {
@@ -122,34 +138,51 @@ namespace Bev.Instruments.Spex
 
         private bool IsBusy()
         {
-            string str = OutputEnter("E");
+            interpreter.Send("E");
+            string str = interpreter.ReadSingleCharacter();
             if (str.Contains("q")) return true;
             return false;
         }
 
         private void Initialize()
         {
-            RemoteHandler.Remote(DeviceAddress);
-            OutputEnter(" ", 2000);
-            OutputEnter(" ", 2000);
-            OutputEnter(" ", 2000);
-            StartMainProgram();
+            // Manual p 26-27
+            ReBootIfHung();
+            //FlushInputBuffer() ?? how ??
+            string response = WhereAmI();
+            if (response == "F")
+            {
+                return;
+            }
+            if (response == "B")
+            {
+                StartUpControllerMainProgram();
+                MotorInit();
+            }
         }
 
-        private void StartMainProgram()
+        private void ReBootIfHung()
         {
-            char[] buff = { 'O', '0', '0', '0', (char)0 };
-            OutputEnter(new string(buff), 500);
+            interpreter.Send((byte)222);
+            Thread.Sleep(500);
         }
 
-        private string OutputEnter(string command, int delay)
+        private string WhereAmI()
         {
-            RemoteHandler.Output(DeviceAddress, command);
-            Thread.Sleep(delay);
-            return RemoteHandler.Enter(DeviceAddress);
+            interpreter.Send(" ");
+            return interpreter.ReadSingleCharacter();
         }
 
-        private string OutputEnter(string command) => OutputEnter(command, noDelay);
+        private void StartUpControllerMainProgram()
+        {
+            byte[] buffer = { 0x4F, 0x30, 0x30, 0x30, 0x00 };
+            interpreter.Send(buffer);
+            Thread.Sleep(500);
+            string response = interpreter.ReadSingleCharacter();
+            if (response == "*")
+                return;
+            throw new Exception("SPEX controller did not enter main program");
+        }
 
         private string StripFirstChar(string str)
         {
@@ -158,6 +191,7 @@ namespace Bev.Instruments.Spex
             return str.Substring(1);
         }
 
+        private readonly SpexCommandInterpreter interpreter;
         private WavelengthConverter wlConv;
         private const int noDelay = 0;
         private const int defaultDelay = 100;

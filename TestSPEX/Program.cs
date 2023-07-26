@@ -1,8 +1,5 @@
-﻿using Bev.IO.RemoteInterface;
-using Bev.IO.Gpib.Keithley500Serial;
+﻿using System;
 using Bev.Instruments.Spex;
-using RS232Interface;
-using System;
 
 namespace TestSPEX
 {
@@ -10,21 +7,33 @@ namespace TestSPEX
     {
         static void Main(string[] args)
         {
-            string comPort = "COM1";
+
             int gpibAddress = 3;
 
-            SerialInterface remote = new SerialInterface(comPort);
-            // Keithley500Serial remote = new Keithley500Serial(comPort);
-
-            Spex spex = new Spex(gpibAddress, remote);
+            Spex spex = new Spex(gpibAddress);
 
             Console.WriteLine(spex.InstrumentID);
 
-            spex.MoveRelativeRaw(1000);
-            Console.WriteLine(spex.GetPositionRaw());
-            spex.MoveRelativeRaw(-1000);
-            Console.WriteLine(spex.GetPositionRaw());
+            Console.WriteLine($"steps: {spex.GetCurrentStepPosition()} -> {spex.GetCurrentWavelength()} nm");
+            spex.MoveRelativeSteps(1000);
+            Console.WriteLine($"steps: {spex.GetCurrentStepPosition()} -> {spex.GetCurrentWavelength()} nm");
+            spex.MoveRelativeSteps(-1000);
+            Console.WriteLine($"steps: {spex.GetCurrentStepPosition()} -> {spex.GetCurrentWavelength()} nm");
 
+            Console.WriteLine();
+
+            Console.Write("Input displayed wavelength (in nm): ");
+            double displayWavelength = double.Parse(Console.ReadLine());
+            Console.WriteLine($"your input: {displayWavelength} nm");
+
+            int steps = spex.WavelengthCalibration.WavelengthToSteps(displayWavelength);
+            spex.SetCurrentStepPosition(steps);
+
+            Console.WriteLine($"steps: {spex.GetCurrentStepPosition()} -> {spex.GetCurrentWavelength()} nm");
+            spex.MoveRelativeSteps(1000);
+            Console.WriteLine($"steps: {spex.GetCurrentStepPosition()} -> {spex.GetCurrentWavelength()} nm");
+            spex.MoveRelativeSteps(-1000);
+            Console.WriteLine($"steps: {spex.GetCurrentStepPosition()} -> {spex.GetCurrentWavelength()} nm");
         }
     }
 }

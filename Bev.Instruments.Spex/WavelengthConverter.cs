@@ -13,7 +13,7 @@
         public double StepsPerNanometer { get; }
         public double StepsOffset { get; }
 
-        public double StepsToWavelength(int steps) => (double)steps / StepsPerNanometer;
+        public double StepsToWavelength(int steps) => steps / StepsPerNanometer;
 
         public int WavelengthToSteps(double wavelength) => (int)(wavelength * StepsPerNanometer);
     }

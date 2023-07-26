@@ -34,6 +34,8 @@
     <Reference Include="Bev.IO.RemoteInterface">
       <HintPath>..\..\Bev.IO.RemoteInterface\Bev.IO.RemoteInterface\bin\Release\Bev.IO.RemoteInterface.dll</HintPath>
     </Reference>
+    <Reference Include="Ivi.Visa, Version=7.2.0.0, Culture=neutral, PublicKeyToken=a128c98f1d7717c1, processorArchitecture=MSIL" />
+    <Reference Include="NationalInstruments.Visa, Version=23.3.0.49276, Culture=neutral, PublicKeyToken=2eaa5af0834e221d, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -44,8 +46,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Ieee488Handler.cs" />
     <Compile Include="Spex.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SpexCommandInterpreter.cs" />
     <Compile Include="WavelengthConverter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
