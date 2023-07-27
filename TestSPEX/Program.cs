@@ -9,6 +9,10 @@ namespace TestSPEX
     {
         static void Main(string[] args)
         {
+            // 1681 B SN:4867 V3.6  Maple Leaf - V3.6  Maple Leaf @ 03
+            // 1200 nm -> limit switch at 1199 nm
+            // -90 nm  -> limit switch at 9933.5 nm
+
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 
             IWavelengthConverter waveConverter = new WavelengthConverter(50.0, 0.0);
@@ -32,8 +36,15 @@ namespace TestSPEX
             Console.WriteLine($"steps to set: {steps}");
             spex.SetCurrentStepPosition(steps);
             Console.WriteLine($"steps: {spex.GetCurrentStepPosition()} -> {spex.GetCurrentWavelength()} nm");
-
+            Console.WriteLine();
             double wavelength = 0;
+
+            //for (int i = 400; i <= 800; i++)
+            //{
+            //    spex.MoveAbsoluteWavelength(i);
+            //    Console.WriteLine($"wavelength {i} nm");
+            //    Thread.Sleep(200);
+            //}
 
             while (true)
             {
