@@ -54,6 +54,7 @@ namespace TestSPEX
                 Console.WriteLine($"moving to {wavelength} nm");
                 spex.MoveAbsoluteWavelength(wavelength);
                 Console.WriteLine($"steps: {spex.GetCurrentStepPosition()} -> {spex.GetCurrentWavelength()} nm");
+                Console.WriteLine(spex.LimitSwitchStatusToString(spex.GetLimitSwitchStatus()));
                 Console.WriteLine();
             }
 
@@ -61,6 +62,7 @@ namespace TestSPEX
             Console.WriteLine($"moving to {wavelength} nm");
             spex.MoveAbsoluteWavelength(wavelength);
             Console.WriteLine($"steps: {spex.GetCurrentStepPosition()} -> {spex.GetCurrentWavelength()} nm");
+            Console.WriteLine(spex.LimitSwitchStatusToString(spex.GetLimitSwitchStatus()));
 
         }
     }

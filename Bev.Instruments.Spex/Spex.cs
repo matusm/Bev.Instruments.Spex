@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Text;
 using System.Threading;
-using Bev.IO.RemoteInterface;
 
 namespace Bev.Instruments.Spex
 {
@@ -106,6 +106,20 @@ namespace Bev.Instruments.Spex
             interpreter.ReadSingleCharacter();
         }
 
+        public byte GetLimitSwitchStatus()
+        {
+            string str = interpreter.Query("K");
+            byte[] buffer = Encoding.ASCII.GetBytes(str);
+            if (buffer.Length == 1) 
+                return buffer[0];
+            return 255;
+        }
+
+        public string LimitSwitchStatusToString(byte b)
+        {
+            return $" {Convert.ToString(b, toBase: 2).PadLeft(8, '0'),8}";
+        }
+
         private string GetInstrumentType()
         {
             // there is no documented way to obtain the type
@@ -122,8 +136,8 @@ namespace Bev.Instruments.Spex
 
         private string GetDeviceFirmwareVersion()
         {
-            string zStr = interpreter.Query("z");
-            string yStr = interpreter.Query("y");
+            string zStr = interpreter.Query("z"); // main program version
+            string yStr = interpreter.Query("y"); // boot program version
             return $"{zStr} - {yStr}";
         }
 
