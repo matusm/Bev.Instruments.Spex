@@ -58,7 +58,7 @@ namespace Bev.Instruments.Spex
 
         public void SetCurrentStepPosition(int stepPosition)
         {
-            interpreter.Send($"F0,{stepPosition}");
+            interpreter.Send($"G0,{stepPosition}");
             interpreter.ReadSingleCharacter();
         }
 
@@ -90,7 +90,7 @@ namespace Bev.Instruments.Spex
         {
             int currentPos = GetCurrentStepPosition();
             int steps = position - currentPos;
-            MoveRelativeWavelength(steps);
+            MoveRelativeSteps(steps);
         }
 
         public double GetCurrentWavelength() => wlConv.StepsToWavelength(GetCurrentStepPosition());
@@ -102,6 +102,7 @@ namespace Bev.Instruments.Spex
         public void MotorInit()
         {
             interpreter.Send("A");
+            Thread.Sleep(defaultDelay);
             interpreter.ReadSingleCharacter();
         }
 
@@ -138,8 +139,9 @@ namespace Bev.Instruments.Spex
 
         private bool IsBusy()
         {
+            // the manual is misleading!
             interpreter.Send("E");
-            string str = interpreter.ReadSingleCharacter();
+            string str = interpreter.Read();
             if (str.Contains("q")) return true;
             return false;
         }
@@ -164,7 +166,7 @@ namespace Bev.Instruments.Spex
         private void ReBootIfHung()
         {
             interpreter.Send((byte)222);
-            Thread.Sleep(500);
+            Thread.Sleep(defaultDelay);
         }
 
         private string WhereAmI()
@@ -177,24 +179,16 @@ namespace Bev.Instruments.Spex
         {
             byte[] buffer = { 0x4F, 0x30, 0x30, 0x30, 0x00 };
             interpreter.Send(buffer);
-            Thread.Sleep(500);
+            Thread.Sleep(defaultDelay);
             string response = interpreter.ReadSingleCharacter();
             if (response == "*")
                 return;
             throw new Exception("SPEX controller did not enter main program");
         }
 
-        private string StripFirstChar(string str)
-        {
-            if (string.IsNullOrEmpty(str)) return str;
-            if (str.Length == 1) return str;
-            return str.Substring(1);
-        }
-
         private readonly SpexCommandInterpreter interpreter;
         private WavelengthConverter wlConv;
-        private const int noDelay = 0;
-        private const int defaultDelay = 100;
+        private const int defaultDelay = 600;
         private const int backlashSteps = 500;
     }
 }

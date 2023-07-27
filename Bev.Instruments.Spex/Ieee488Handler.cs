@@ -28,7 +28,13 @@ namespace Bev.Instruments.Spex
 
         internal void SendBytes(byte b) => SendBytes(new byte[] { b });
 
-        internal byte ReadByte() => gpibSession.RawIO.Read(1)[0];
+        internal byte ReadByte()
+        {
+            byte[] reply = gpibSession.RawIO.Read(1);
+            if (reply == null) return 0;
+            if (reply.Length == 0) return 0;
+            return reply[0];
+        }
 
         internal byte[] ReadBytes() => gpibSession.RawIO.Read();
 

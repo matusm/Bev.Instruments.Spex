@@ -20,8 +20,7 @@ namespace Bev.Instruments.Spex
 
         internal void Send(string command)
         {
-            if (string.IsNullOrWhiteSpace(command))
-                return;
+            if (command.Length == 0) return;
             if (command.Length > 1)
             {
                 command = command + "\r";
@@ -34,7 +33,7 @@ namespace Bev.Instruments.Spex
         {
             byte[] buffer = ieee.ReadBytes();
             string answer = Encoding.ASCII.GetString(buffer);
-            string firstLetter = answer.Substring(0, 1);
+            //string firstLetter = answer.Substring(0, 1);
             answer = Clean(answer);
             return answer;
         }
@@ -58,6 +57,13 @@ namespace Bev.Instruments.Spex
         private string RemoveConfirmation(string original) => original.TrimStart('o');
 
         private string Clean(string original) => RemoveConfirmation(CleanFromNewline(original));
+
+        private string StripFirstChar(string str)
+        {
+            if (string.IsNullOrEmpty(str)) return str;
+            if (str.Length == 1) return str;
+            return str.Substring(1);
+        }
 
     }
 }
