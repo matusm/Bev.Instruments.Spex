@@ -1,6 +1,6 @@
 ﻿namespace Bev.Instruments.Spex
 {
-    public class WavelengthConverter
+    public class WavelengthConverter : IWavelengthConverter
     {
         public WavelengthConverter() : this(50.0, 0.0) { }
         public WavelengthConverter(double stepsPerNm) : this(stepsPerNm, 0.0) { }
