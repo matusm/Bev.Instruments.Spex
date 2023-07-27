@@ -40,16 +40,16 @@ namespace Bev.Instruments.Spex
         }
         #endregion
 
-        public Spex(int deviceAddress)
+        public Spex(int deviceAddress, IWavelengthConverter wavelengthConverter)
         {
             interpreter = new SpexCommandInterpreter(deviceAddress);
-            wlConv = new WavelengthConverter();
+            wlConv = wavelengthConverter;
             Initialize();
         }
 
         public int DeviceAddress => interpreter.DeviceAddress;
         public int CurrentPosition => GetCurrentStepPosition();
-        public WavelengthConverter WavelengthCalibration => wlConv;
+        public IWavelengthConverter WavelengthCalibration => wlConv;
         public string InstrumentManufacturer => "Jobin-Yvon / SPEX";
         public string InstrumentType => GetInstrumentType();
         public string InstrumentSerialNumber => GetDeviceSerialNumber();
@@ -187,7 +187,7 @@ namespace Bev.Instruments.Spex
         }
 
         private readonly SpexCommandInterpreter interpreter;
-        private WavelengthConverter wlConv;
+        private IWavelengthConverter wlConv;
         private const int defaultDelay = 600;
         private const int backlashSteps = 500;
     }

@@ -11,8 +11,10 @@ namespace TestSPEX
         {
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 
+            IWavelengthConverter waveConverter = new WavelengthConverter(50.0, 0.0);
+
             int gpibAddress = 3;
-            Spex spex = new Spex(gpibAddress);
+            Spex spex = new Spex(gpibAddress, waveConverter);
 
             Console.WriteLine(spex.InstrumentID);
             Console.WriteLine($"steps: {spex.GetCurrentStepPosition()} -> {spex.GetCurrentWavelength()} nm");
