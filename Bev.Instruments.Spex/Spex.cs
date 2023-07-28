@@ -26,6 +26,12 @@ namespace Bev.Instruments.Spex
             }
         }
 
+        /**********************************************/
+        /* There is no documented way to obtain the   */
+        /* instrument type automatically.             */
+        /* This very site specific method infers the  */
+        /* type from the GBIP address.                */
+        /**********************************************/
         private string GetInstrumentTypeForBevLab()
         {
             switch (DeviceAddress)
@@ -100,7 +106,7 @@ namespace Bev.Instruments.Spex
 
         public double GetCurrentWavelength() => waveConverter.StepsToWavelength(GetCurrentStepPosition());
 
-        public void MoveRelativeWavelength(double wavelength) => MoveRelativeSteps(waveConverter.WavelengthToSteps(wavelength)); // this is wrong! (offset)
+        public void MoveRelativeWavelength(double interval) => MoveAbsoluteWavelength(GetCurrentWavelength() + interval);
 
         public void MoveAbsoluteWavelength(double wavelength) => MoveAbsoluteSteps(waveConverter.WavelengthToSteps(wavelength));
 
@@ -139,24 +145,11 @@ namespace Bev.Instruments.Spex
             if ((b & 0b00000010) != 0) hitUpperLimitSwitch = true;
         }
 
-        private string LimitSwitchStatusToString(byte b)
-        {
-            return $"{Convert.ToString(b, toBase: 2).PadLeft(8, '0'),8}";
-        }
+        private string LimitSwitchStatusToString(byte b) => $"{Convert.ToString(b, toBase: 2).PadLeft(8, '0'),8}";
 
-        private string GetInstrumentType()
-        {
-            // there is no documented way to obtain the type
-            // use a hard coded dicitonary
-            return GetInstrumentTypeForBevLab();
-        }
+        private string GetInstrumentType() => GetInstrumentTypeForBevLab();
 
-        private string GetDeviceSerialNumber()
-        {
-            // there is no documented way to obtain the serial number
-            // use a hard coded dicitonary
-            return GetDeviceSerialNumberForBevLab();
-        }
+        private string GetDeviceSerialNumber() => GetDeviceSerialNumberForBevLab();
 
         private string GetDeviceFirmwareVersion()
         {
@@ -165,10 +158,7 @@ namespace Bev.Instruments.Spex
             return $"{zStr} - {yStr}";
         }
 
-        private void MoveRelativeGeneric(int steps)
-        {
-            interpreter.Query($"F0,{steps}");
-        }
+        private void MoveRelativeGeneric(int steps) => interpreter.Query($"F0,{steps}");
 
         private void ReturnOnHalt()
         {
@@ -177,7 +167,7 @@ namespace Bev.Instruments.Spex
 
         private bool IsBusy()
         {
-            // the manual is misleading!
+            // the manual (p 53) is misleading!
             interpreter.Send("E");
             string str = interpreter.Read();
             if (str.Contains("q")) return true;
@@ -215,8 +205,7 @@ namespace Bev.Instruments.Spex
 
         private void StartUpControllerMainProgram()
         {
-            byte[] buffer = { 0x4F, 0x30, 0x30, 0x30, 0x00 };
-            interpreter.Send(buffer);
+            interpreter.Send(new byte[] { 0x4F, 0x30, 0x30, 0x30, 0x00 });
             Thread.Sleep(defaultDelay);
             string response = interpreter.ReadSingleCharacter();
             if (response == "*")
