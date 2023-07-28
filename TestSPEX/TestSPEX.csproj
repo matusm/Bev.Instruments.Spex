@@ -36,15 +36,6 @@
     <Reference Include="Bev.Instruments.Spex">
       <HintPath>..\Bev.Instruments.Spex\bin\Release\Bev.Instruments.Spex.dll</HintPath>
     </Reference>
-    <Reference Include="Bev.IO.Gpib.Keithley500Serial">
-      <HintPath>..\..\Bev.IO.Gpib.Keithley500Serial\Bev.IO.Gpib.Keithley500Serial\bin\Release\Bev.IO.Gpib.Keithley500Serial.dll</HintPath>
-    </Reference>
-    <Reference Include="Bev.IO.RemoteInterface">
-      <HintPath>..\..\Bev.IO.RemoteInterface\Bev.IO.RemoteInterface\bin\Release\Bev.IO.RemoteInterface.dll</HintPath>
-    </Reference>
-    <Reference Include="RS232Interface">
-      <HintPath>..\RS232Interface\bin\Release\RS232Interface.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />

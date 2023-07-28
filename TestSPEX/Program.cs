@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Globalization;
-using System.Threading;
 using Bev.Instruments.Spex;
 
 namespace TestSPEX
