@@ -43,23 +43,26 @@ namespace Bev.Instruments.Spex
         public Spex(int deviceAddress, IWavelengthConverter wavelengthConverter)
         {
             interpreter = new SpexCommandInterpreter(deviceAddress);
-            wlConv = wavelengthConverter;
+            waveConverter = wavelengthConverter;
             Initialize();
+            ClearLimitSwitchFlag();
         }
 
         public int DeviceAddress => interpreter.DeviceAddress;
         public int CurrentPosition => GetCurrentStepPosition();
-        public IWavelengthConverter WavelengthCalibration => wlConv;
+        public bool HitAnyLimitSwitch => hitLowerLimitSwitch || hitUpperLimitSwitch;
+        public IWavelengthConverter WavelengthCalibration => waveConverter;
         public string InstrumentManufacturer => "Jobin-Yvon / SPEX";
         public string InstrumentType => GetInstrumentType();
         public string InstrumentSerialNumber => GetDeviceSerialNumber();
         public string InstrumentFirmwareVersion => GetDeviceFirmwareVersion();
-        public string InstrumentID => $"{InstrumentType} SN:{InstrumentSerialNumber} {InstrumentFirmwareVersion} @ {DeviceAddress:D2}";
+        public string InstrumentID => $"{InstrumentManufacturer} {InstrumentType} SN:{InstrumentSerialNumber} {InstrumentFirmwareVersion} @ {DeviceAddress:D2}";
 
         public void SetCurrentStepPosition(int stepPosition)
         {
             interpreter.Send($"G0,{stepPosition}");
             interpreter.ReadSingleCharacter();
+            ClearLimitSwitchFlag(); // really?
         }
 
         public int GetCurrentStepPosition()
@@ -81,9 +84,11 @@ namespace Bev.Instruments.Spex
             {
                 MoveRelativeGeneric(steps - backlashSteps);
                 ReturnOnHalt();
+                QueryLimitSwitchStatus();
                 MoveRelativeGeneric(backlashSteps);
                 ReturnOnHalt();
             }
+            QueryLimitSwitchStatus();
         }
 
         public void MoveAbsoluteSteps(int position)
@@ -93,11 +98,11 @@ namespace Bev.Instruments.Spex
             MoveRelativeSteps(steps);
         }
 
-        public double GetCurrentWavelength() => wlConv.StepsToWavelength(GetCurrentStepPosition());
+        public double GetCurrentWavelength() => waveConverter.StepsToWavelength(GetCurrentStepPosition());
 
-        public void MoveRelativeWavelength(double wavelength) => MoveRelativeSteps(wlConv.WavelengthToSteps(wavelength)); // this is wrong! (offset)
+        public void MoveRelativeWavelength(double wavelength) => MoveRelativeSteps(waveConverter.WavelengthToSteps(wavelength)); // this is wrong! (offset)
 
-        public void MoveAbsoluteWavelength(double wavelength) => MoveAbsoluteSteps(wlConv.WavelengthToSteps(wavelength));
+        public void MoveAbsoluteWavelength(double wavelength) => MoveAbsoluteSteps(waveConverter.WavelengthToSteps(wavelength));
 
         public void MotorInit()
         {
@@ -106,18 +111,37 @@ namespace Bev.Instruments.Spex
             interpreter.ReadSingleCharacter();
         }
 
-        public byte GetLimitSwitchStatus()
+        public void ClearLimitSwitchFlag()
+        {
+            hitLowerLimitSwitch = false;
+            hitUpperLimitSwitch = false;
+        }
+
+        private void QueryLimitSwitchStatus()
+        {
+            byte b = GetLimitSwitchStatus();
+            InterpretStatusByte(b);
+            Console.WriteLine(LimitSwitchStatusToString(b)); // comment out for release
+        }
+
+        private byte GetLimitSwitchStatus()
         {
             string str = interpreter.Query("K");
             byte[] buffer = Encoding.ASCII.GetBytes(str);
             if (buffer.Length == 1) 
                 return buffer[0];
-            return 255;
+            return 0;
         }
 
-        public string LimitSwitchStatusToString(byte b)
+        private void InterpretStatusByte(byte b)
         {
-            return $" {Convert.ToString(b, toBase: 2).PadLeft(8, '0'),8}";
+            if ((b & 0b00000001) != 0) hitLowerLimitSwitch = true;
+            if ((b & 0b00000010) != 0) hitUpperLimitSwitch = true;
+        }
+
+        private string LimitSwitchStatusToString(byte b)
+        {
+            return $"{Convert.ToString(b, toBase: 2).PadLeft(8, '0'),8}";
         }
 
         private string GetInstrumentType()
@@ -201,7 +225,9 @@ namespace Bev.Instruments.Spex
         }
 
         private readonly SpexCommandInterpreter interpreter;
-        private IWavelengthConverter wlConv;
+        private IWavelengthConverter waveConverter;
+        private bool hitLowerLimitSwitch;
+        private bool hitUpperLimitSwitch;
         private const int defaultDelay = 600;
         private const int backlashSteps = 500;
     }

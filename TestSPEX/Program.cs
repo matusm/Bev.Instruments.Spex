@@ -22,10 +22,12 @@ namespace TestSPEX
 
             Console.WriteLine(spex.InstrumentID);
             Console.WriteLine($"steps: {spex.GetCurrentStepPosition()} -> {spex.GetCurrentWavelength()} nm");
-            spex.MoveRelativeSteps(-1500); //Thread.Sleep(10000);
+            spex.MoveRelativeSteps(-1000); 
             Console.WriteLine($"steps: {spex.GetCurrentStepPosition()} -> {spex.GetCurrentWavelength()} nm");
-            spex.MoveRelativeSteps(1500); //Thread.Sleep(10000);
+            Console.WriteLine(spex.HitAnyLimitSwitch);
+            spex.MoveRelativeSteps(100); 
             Console.WriteLine($"steps: {spex.GetCurrentStepPosition()} -> {spex.GetCurrentWavelength()} nm");
+            Console.WriteLine(spex.HitAnyLimitSwitch);
             Console.WriteLine();
             Console.WriteLine();
 
@@ -37,7 +39,6 @@ namespace TestSPEX
             spex.SetCurrentStepPosition(steps);
             Console.WriteLine($"steps: {spex.GetCurrentStepPosition()} -> {spex.GetCurrentWavelength()} nm");
             Console.WriteLine();
-            double wavelength = 0;
 
             //for (int i = 400; i <= 800; i++)
             //{
@@ -46,6 +47,7 @@ namespace TestSPEX
             //    Thread.Sleep(200);
             //}
 
+            double wavelength;
             while (true)
             {
                 Console.Write("Drive to wavelength (in nm): ");
@@ -54,15 +56,15 @@ namespace TestSPEX
                 Console.WriteLine($"moving to {wavelength} nm");
                 spex.MoveAbsoluteWavelength(wavelength);
                 Console.WriteLine($"steps: {spex.GetCurrentStepPosition()} -> {spex.GetCurrentWavelength()} nm");
-                Console.WriteLine(spex.LimitSwitchStatusToString(spex.GetLimitSwitchStatus()));
+                Console.WriteLine(spex.HitAnyLimitSwitch);
                 Console.WriteLine();
             }
 
-            wavelength = 600;
+            wavelength = 400;
             Console.WriteLine($"moving to {wavelength} nm");
             spex.MoveAbsoluteWavelength(wavelength);
             Console.WriteLine($"steps: {spex.GetCurrentStepPosition()} -> {spex.GetCurrentWavelength()} nm");
-            Console.WriteLine(spex.LimitSwitchStatusToString(spex.GetLimitSwitchStatus()));
+            Console.WriteLine(spex.HitAnyLimitSwitch);
 
         }
     }
