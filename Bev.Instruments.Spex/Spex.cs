@@ -117,6 +117,20 @@ namespace Bev.Instruments.Spex
             interpreter.ReadSingleCharacter();
         }
 
+        public void SetMotorSpeed(int minFrequency, int maxFrequency, int rampTime)
+        {
+            if (minFrequency < 100) return;
+            if (maxFrequency < 100) return;
+            if (rampTime < 100) return;
+            if (minFrequency > 80000) return;
+            if (maxFrequency > 80000) return;
+            if (rampTime > 65535) return;
+            if (minFrequency > maxFrequency) return;
+            interpreter.Query($"B0,{minFrequency},{maxFrequency},{rampTime}");
+        }
+
+        public string GetMotorSpeed() => interpreter.Query("C0");
+
         public void ClearLimitSwitchFlag()
         {
             hitLowerLimitSwitch = false;
