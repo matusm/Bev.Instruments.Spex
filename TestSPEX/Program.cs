@@ -13,18 +13,21 @@ namespace TestSPEX
             // -90 nm  -> limit switch at 9933.5 nm
 
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
-
             IWavelengthConverter waveConverter = new WavelengthConverter(50.0, 0.0);
 
             int gpibAddress = 3;
             Spex spex = new Spex(gpibAddress, waveConverter);
 
             Console.WriteLine(spex.InstrumentID);
+            Console.WriteLine(spex.GetMotorSpeed());
+            spex.SetMotorSpeed(200, 400, 1000);
+            Console.WriteLine(spex.GetMotorSpeed());
+
             Console.WriteLine($"steps: {spex.GetCurrentStepPosition()} -> {spex.GetCurrentWavelength()} nm");
-            spex.MoveRelativeSteps(-1000); 
+            spex.MoveRelativeSteps(+2000); 
             Console.WriteLine($"steps: {spex.GetCurrentStepPosition()} -> {spex.GetCurrentWavelength()} nm");
             Console.WriteLine(spex.HitAnyLimitSwitch);
-            spex.MoveRelativeSteps(100); 
+            spex.MoveRelativeSteps(-1000); 
             Console.WriteLine($"steps: {spex.GetCurrentStepPosition()} -> {spex.GetCurrentWavelength()} nm");
             Console.WriteLine(spex.HitAnyLimitSwitch);
             Console.WriteLine();
@@ -59,6 +62,7 @@ namespace TestSPEX
                 Console.WriteLine();
             }
 
+            Console.WriteLine();
             wavelength = 400;
             Console.WriteLine($"moving to {wavelength} nm");
             spex.MoveAbsoluteWavelength(wavelength);

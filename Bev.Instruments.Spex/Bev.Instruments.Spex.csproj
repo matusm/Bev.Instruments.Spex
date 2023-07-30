@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="Ieee488Handler.cs" />
     <Compile Include="IWavelengthConverter.cs" />
+    <Compile Include="MotorSpeedParameter.cs" />
     <Compile Include="Spex.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SpexCommandInterpreter.cs" />

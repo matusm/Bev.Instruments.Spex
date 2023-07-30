@@ -129,12 +129,25 @@ namespace Bev.Instruments.Spex
             interpreter.Query($"B0,{minFrequency},{maxFrequency},{rampTime}");
         }
 
-        public (int MinFrequency, int MaxFrequency, int rampTime) GetMotorSpeed()
+        public string GetMotorSpeed() => interpreter.Query("C0");
+
+        public int GetMotorSpeed(MotorSpeedParameter parameter)
         {
-            string str = GetMotorSpeedRaw();
+            string str = GetMotorSpeed();
             string[] tokens = str.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-            if (tokens.Length != 3) return (-1,-1,-1);
-            return (int.Parse(tokens[0]), int.Parse(tokens[1]), int.Parse(tokens[2])); 
+            if (tokens.Length != 3)
+                return -1;
+            switch (parameter)
+            {
+                case MotorSpeedParameter.MinFrequency:
+                    return int.Parse(tokens[0]);
+                case MotorSpeedParameter.MaxFrequency:
+                    return int.Parse(tokens[1]);
+                case MotorSpeedParameter.RampTime:
+                    return int.Parse(tokens[2]);
+                default:
+                    return -1;
+            }
         }
 
         public void ClearLimitSwitchFlag()
@@ -166,8 +179,6 @@ namespace Bev.Instruments.Spex
         }
 
         private string LimitSwitchStatusToString(byte b) => $"{Convert.ToString(b, toBase: 2).PadLeft(8, '0'),8}";
-
-        private string GetMotorSpeedRaw() => interpreter.Query("C0");
 
         private string GetInstrumentType() => GetInstrumentTypeForBevLab();
 
