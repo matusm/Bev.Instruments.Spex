@@ -160,8 +160,10 @@ namespace Bev.Instruments.Spex
         {
             byte b = GetLimitSwitchStatus();
             InterpretStatusByte(b);
-            Console.WriteLine(LimitSwitchStatusToString(b)); // comment out for release
+            //Console.WriteLine(LimitSwitchStatusToString(b)); // comment out for release
         }
+
+        private string LimitSwitchStatusToString(byte b) => $"{Convert.ToString(b, toBase: 2).PadLeft(8, '0'),8}";
 
         private byte GetLimitSwitchStatus()
         {
@@ -178,8 +180,6 @@ namespace Bev.Instruments.Spex
             if ((b & 0b00000010) != 0) hitUpperLimitSwitch = true;
         }
 
-        private string LimitSwitchStatusToString(byte b) => $"{Convert.ToString(b, toBase: 2).PadLeft(8, '0'),8}";
-
         private string GetInstrumentType() => GetInstrumentTypeForBevLab();
 
         private string GetDeviceSerialNumber() => GetDeviceSerialNumberForBevLab();
@@ -195,7 +195,16 @@ namespace Bev.Instruments.Spex
 
         private void ReturnOnHalt()
         {
-            while (IsBusy()) { }
+            while (IsBusy()) 
+            {
+                UpdatePosition();
+            }
+        }
+
+        private void UpdatePosition()
+        {
+            double wl = GetCurrentWavelength();
+            Console.WriteLine($"   -> {wl} nm"); // comment out for release
         }
 
         private bool IsBusy()
