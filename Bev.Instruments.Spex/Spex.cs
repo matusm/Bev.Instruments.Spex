@@ -37,9 +37,9 @@ namespace Bev.Instruments.Spex
             switch (DeviceAddress)
             {
                 case 1:
-                    return "1680 B";
+                    return "1680B";
                 case 3:
-                    return "1681 B";
+                    return "1681B";
                 default:
                     return "---";
             }

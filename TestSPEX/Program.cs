@@ -20,14 +20,14 @@ namespace TestSPEX
 
             Console.WriteLine(spex.InstrumentID);
             Console.WriteLine(spex.GetMotorSpeed());
-            spex.SetMotorSpeed(200, 400, 1000);
-            Console.WriteLine(spex.GetMotorSpeed());
+            //spex.SetMotorSpeed(200, 400, 1000);
+            //Console.WriteLine(spex.GetMotorSpeed());
 
             Console.WriteLine($"steps: {spex.GetCurrentStepPosition()} -> {spex.GetCurrentWavelength()} nm");
             spex.MoveRelativeSteps(+2000); 
             Console.WriteLine($"steps: {spex.GetCurrentStepPosition()} -> {spex.GetCurrentWavelength()} nm");
             Console.WriteLine(spex.HitAnyLimitSwitch);
-            spex.MoveRelativeSteps(-1000); 
+            spex.MoveRelativeSteps(-2000); 
             Console.WriteLine($"steps: {spex.GetCurrentStepPosition()} -> {spex.GetCurrentWavelength()} nm");
             Console.WriteLine(spex.HitAnyLimitSwitch);
             Console.WriteLine();
@@ -63,7 +63,7 @@ namespace TestSPEX
             }
 
             Console.WriteLine();
-            wavelength = 400;
+            wavelength = 000;
             Console.WriteLine($"moving to {wavelength} nm");
             spex.MoveAbsoluteWavelength(wavelength);
             Console.WriteLine($"steps: {spex.GetCurrentStepPosition()} -> {spex.GetCurrentWavelength()} nm");
