@@ -19,18 +19,11 @@ namespace TestSPEX
             Spex spex = new Spex(gpibAddress, waveConverter);
 
             Console.WriteLine(spex.InstrumentID);
-            Console.WriteLine(spex.GetMotorSpeed());
-            //spex.SetMotorSpeed(200, 400, 1000);
-            //Console.WriteLine(spex.GetMotorSpeed());
+            Console.WriteLine("Motor speed parameters: " + spex.GetMotorSpeed());
 
-            Console.WriteLine($"steps: {spex.GetCurrentStepPosition()} -> {spex.GetCurrentWavelength()} nm");
             spex.MoveRelativeSteps(+2000); 
-            Console.WriteLine($"steps: {spex.GetCurrentStepPosition()} -> {spex.GetCurrentWavelength()} nm");
-            Console.WriteLine(spex.HitAnyLimitSwitch);
-            spex.MoveRelativeSteps(-2000); 
-            Console.WriteLine($"steps: {spex.GetCurrentStepPosition()} -> {spex.GetCurrentWavelength()} nm");
-            Console.WriteLine(spex.HitAnyLimitSwitch);
-            Console.WriteLine();
+            spex.MoveRelativeSteps(-2000);
+            OutputPosition();
             Console.WriteLine();
 
             Console.Write("Input displayed wavelength (in nm): ");
@@ -39,35 +32,34 @@ namespace TestSPEX
             int steps = spex.WavelengthCalibration.WavelengthToSteps(displayWavelength);
             Console.WriteLine($"steps to set: {steps}");
             spex.SetCurrentStepPosition(steps);
-            Console.WriteLine($"steps: {spex.GetCurrentStepPosition()} -> {spex.GetCurrentWavelength()} nm");
-            Console.WriteLine();
-
-            //for (int i = 400; i <= 800; i++)
-            //{
-            //    spex.MoveAbsoluteWavelength(i);
-            //    Console.WriteLine($"wavelength {i} nm");
-            //    Thread.Sleep(200);
-            //}
+            OutputPosition();
 
             double wavelength;
             while (true)
             {
                 Console.Write("Drive to wavelength (in nm): ");
                 wavelength = double.Parse(Console.ReadLine());
-                if (wavelength < -100) break;
+                if (wavelength < -200) break;
                 Console.WriteLine($"moving to {wavelength} nm");
                 spex.MoveAbsoluteWavelength(wavelength);
-                Console.WriteLine($"steps: {spex.GetCurrentStepPosition()} -> {spex.GetCurrentWavelength()} nm");
-                Console.WriteLine(spex.HitAnyLimitSwitch);
-                Console.WriteLine();
+                OutputPosition();
             }
 
             Console.WriteLine();
             wavelength = 000;
             Console.WriteLine($"moving to {wavelength} nm");
             spex.MoveAbsoluteWavelength(wavelength);
-            Console.WriteLine($"steps: {spex.GetCurrentStepPosition()} -> {spex.GetCurrentWavelength()} nm");
-            Console.WriteLine(spex.HitAnyLimitSwitch);
+            OutputPosition();
+
+
+
+
+            void OutputPosition()
+            {
+                Console.WriteLine($"steps: {spex.GetCurrentStepPosition()} -> {spex.GetCurrentWavelength():F2} nm");
+                Console.WriteLine(spex.HitAnyLimitSwitch);
+                Console.WriteLine();
+            }
 
         }
     }

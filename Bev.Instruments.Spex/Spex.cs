@@ -51,14 +51,13 @@ namespace Bev.Instruments.Spex
             interpreter = new SpexCommandInterpreter(deviceAddress);
             waveConverter = wavelengthConverter;
             Initialize();
-            ClearLimitSwitchFlag();
         }
 
         public int DeviceAddress => interpreter.DeviceAddress;
         public int CurrentPosition => GetCurrentStepPosition();
         public bool HitAnyLimitSwitch => hitLowerLimitSwitch || hitUpperLimitSwitch;
         public IWavelengthConverter WavelengthCalibration => waveConverter;
-        public string InstrumentManufacturer => "Jobin-Yvon / SPEX";
+        public string InstrumentManufacturer => "Jobin-Yvon/SPEX";
         public string InstrumentType => GetInstrumentType();
         public string InstrumentSerialNumber => GetDeviceSerialNumber();
         public string InstrumentFirmwareVersion => GetDeviceFirmwareVersion();
@@ -73,8 +72,9 @@ namespace Bev.Instruments.Spex
 
         public int GetCurrentStepPosition()
         {
+            // negative step positions are valid!
             string str = interpreter.Query("H0");
-            return int.TryParse(str, out int value) ? value : -1; // good old C++ error return value
+            return int.TryParse(str, out int value) ? value : int.MinValue;
         }
 
         public void MoveRelativeSteps(int steps)
@@ -136,15 +136,16 @@ namespace Bev.Instruments.Spex
             string str = GetMotorSpeed();
             string[] tokens = str.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             if (tokens.Length != 3)
-                return -1;
+                return -1;  // good old C++ error return value
+            int value;
             switch (parameter)
             {
                 case MotorSpeedParameter.MinFrequency:
-                    return int.Parse(tokens[0]);
+                    return int.TryParse(tokens[0], out value) ? value : -1;
                 case MotorSpeedParameter.MaxFrequency:
-                    return int.Parse(tokens[1]);
+                    return int.TryParse(tokens[1], out value) ? value : -1;
                 case MotorSpeedParameter.RampTime:
-                    return int.Parse(tokens[2]);
+                    return int.TryParse(tokens[2], out value) ? value : -1;
                 default:
                     return -1;
             }
@@ -188,7 +189,7 @@ namespace Bev.Instruments.Spex
         {
             string zStr = interpreter.Query("z"); // main program version
             string yStr = interpreter.Query("y"); // boot program version
-            return $"{zStr} - {yStr}";
+            return $"{zStr}"; // for the time being the main program is of interest
         }
 
         private void MoveRelativeGeneric(int steps) => interpreter.Query($"F0,{steps}");
@@ -203,8 +204,9 @@ namespace Bev.Instruments.Spex
 
         private void UpdatePosition()
         {
+            // this is the place to raise an event
             double wl = GetCurrentWavelength();
-            Console.WriteLine($"   -> {wl} nm"); // comment out for release
+            //Console.WriteLine($"   -> {wl:F2} nm"); // comment out for release
         }
 
         private bool IsBusy()
