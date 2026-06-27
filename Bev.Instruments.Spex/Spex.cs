@@ -46,9 +46,9 @@ namespace Bev.Instruments.Spex
         }
         #endregion
 
-        public Spex(int deviceAddress, IWavelengthConverter wavelengthConverter)
+        public Spex(IIeee488Handler ieeeHandler, IWavelengthConverter wavelengthConverter)
         {
-            interpreter = new SpexCommandInterpreter(deviceAddress);
+            interpreter = new SpexCommandInterpreter(ieeeHandler);
             waveConverter = wavelengthConverter;
             Initialize();
         }

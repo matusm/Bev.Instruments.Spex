@@ -3,13 +3,13 @@ using NationalInstruments.Visa;
 
 namespace Bev.Instruments.Spex
 {
-    internal class Ieee488Handler
+    public class GpibVisaHandler : IIeee488Handler
     {
         private const int delay = 100;
         private readonly ResourceManager resourceManager;
         private readonly GpibSession gpibSession;
 
-        internal Ieee488Handler(int deviceAddress)
+        public GpibVisaHandler(int deviceAddress)
         {
             resourceManager = new ResourceManager();
             gpibSession = (GpibSession)resourceManager.Open($"GPIB0::{deviceAddress}::INSTR");
@@ -18,17 +18,17 @@ namespace Bev.Instruments.Spex
             gpibSession.TerminationCharacter = 0x0D;
         }
 
-        internal int DeviceAddress => gpibSession.PrimaryAddress;
+        public int DeviceAddress => gpibSession.PrimaryAddress;
 
-        internal void SendBytes(byte[] b)
+        public void SendBytes(byte[] b)
         {
             gpibSession.RawIO.Write(b);
             Thread.Sleep(delay);
         }
 
-        internal void SendBytes(byte b) => SendBytes(new byte[] { b });
+        public void SendBytes(byte b) => SendBytes(new byte[] { b });
 
-        internal byte ReadByte()
+        public byte ReadByte()
         {
             byte[] reply = gpibSession.RawIO.Read(1);
             if (reply == null) return 0;
@@ -36,7 +36,7 @@ namespace Bev.Instruments.Spex
             return reply[0];
         }
 
-        internal byte[] ReadBytes() => gpibSession.RawIO.Read();
+        public byte[] ReadBytes() => gpibSession.RawIO.Read();
 
     }
 }

@@ -5,11 +5,11 @@ namespace Bev.Instruments.Spex
     internal class SpexCommandInterpreter
     {
 
-        private readonly Ieee488Handler ieee;
+        private readonly IIeee488Handler ieee;
 
-        internal SpexCommandInterpreter(int deviceAddress)
+        internal SpexCommandInterpreter(IIeee488Handler ieeeHandler)
         {
-            ieee = new Ieee488Handler(deviceAddress);
+            ieee = ieeeHandler;
         }
 
         internal int DeviceAddress => ieee.DeviceAddress;
@@ -50,7 +50,6 @@ namespace Bev.Instruments.Spex
             Send(command);
             return Read();
         }
-
 
         private string CleanFromNewline(string original) => original.TrimEnd('\r', '\n');
 

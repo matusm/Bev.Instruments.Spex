@@ -13,10 +13,10 @@ namespace TestSPEX
             // -90 nm  -> limit switch at 9933.5 nm
 
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
-            IWavelengthConverter waveConverter = new WavelengthConverter(50.0, 0.0);
-
             int gpibAddress = 3;
-            Spex spex = new Spex(gpibAddress, waveConverter);
+            IIeee488Handler ieeeHandler = new GpibVisaHandler(gpibAddress);
+            IWavelengthConverter waveConverter = new WavelengthConverter(50.0, 0.0);
+            Spex spex = new Spex(ieeeHandler, waveConverter);
 
             Console.WriteLine(spex.InstrumentID);
             Console.WriteLine("Motor speed parameters: " + spex.GetMotorSpeed());
