@@ -49,6 +49,7 @@
     <Compile Include="Domain\GpibVisaHandler.cs" />
     <Compile Include="Abstractions\IWavelengthConverter.cs" />
     <Compile Include="Abstractions\IIeee488Handler.cs" />
+    <Compile Include="Domain\GpibPrologixHandler.cs" />
     <Compile Include="MotorSpeedParameter.cs" />
     <Compile Include="Spex.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

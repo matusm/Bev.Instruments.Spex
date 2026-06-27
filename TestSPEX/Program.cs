@@ -14,7 +14,8 @@ namespace TestSPEX
 
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
             int gpibAddress = 3;
-            IIeee488Handler ieeeHandler = new GpibVisaHandler(gpibAddress);
+            //IIeee488Handler ieeeHandler = new GpibVisaHandler(gpibAddress);
+            IIeee488Handler ieeeHandler = new GpibPrologixHandler(gpibAddress, "COM5");
             IWavelengthConverter waveConverter = new WavelengthConverter(50.0, 0.0);
             Spex spex = new Spex(ieeeHandler, waveConverter);
 
