@@ -14,22 +14,23 @@ namespace TestSPEX
 
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
             int gpibAddress = 3;
+            string comPort = "COM5";
             //IIeee488Handler ieeeHandler = new GpibVisaHandler(gpibAddress);
-            IIeee488Handler ieeeHandler = new GpibPrologixHandler(gpibAddress, "COM5");
+            IIeee488Handler ieeeHandler = new GpibPrologixHandler(gpibAddress, comPort);
             IWavelengthConverter waveConverter = new WavelengthConverter(50.0, 0.0);
             Spex spex = new Spex(ieeeHandler, waveConverter);
 
             Console.WriteLine(spex.InstrumentID);
-            Console.WriteLine("Motor speed parameters: " + spex.GetMotorSpeed());
+            Console.WriteLine($"Motor speed parameters: {spex.GetMotorSpeed()}");
 
             spex.MoveRelativeSteps(+2000); 
             spex.MoveRelativeSteps(-2000);
             OutputPosition();
             Console.WriteLine();
 
-            Console.Write("Input displayed wavelength (in nm): ");
+            Console.Write("Enter wavelength displayed on SPEX (in nm): ");
             double displayWavelength = double.Parse(Console.ReadLine());
-            Console.WriteLine($"your input: {displayWavelength} nm");
+            Console.WriteLine($"Your input: {displayWavelength} nm");
             int steps = spex.WavelengthCalibration.WavelengthToSteps(displayWavelength);
             Console.WriteLine($"steps to set: {steps}");
             spex.SetCurrentStepPosition(steps);
@@ -52,13 +53,10 @@ namespace TestSPEX
             spex.MoveAbsoluteWavelength(wavelength);
             OutputPosition();
 
-
-
-
             void OutputPosition()
             {
                 Console.WriteLine($"steps: {spex.GetCurrentStepPosition()} -> {spex.GetCurrentWavelength():F2} nm");
-                Console.WriteLine(spex.HitAnyLimitSwitch);
+                Console.WriteLine($"Hit any limit switch: {spex.HitAnyLimitSwitch}");
                 Console.WriteLine();
             }
 

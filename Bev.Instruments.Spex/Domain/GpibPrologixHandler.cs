@@ -63,7 +63,7 @@ namespace Bev.Instruments.Spex
             serialPort.DiscardNull = false;
             serialPort.ParityReplace = 0;
             // additional settings from ChatGPT code example
-            serialPort.ReadTimeout = 3000;
+            serialPort.ReadTimeout = 5000;
             serialPort.WriteTimeout = 2000;
             serialPort.NewLine = "\n";
             serialPort.Encoding = Encoding.ASCII;
