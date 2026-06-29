@@ -14,7 +14,7 @@ namespace TestSPEX
 
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
             int gpibAddress = 3;
-            string comPort = "COM5";
+            string comPort = "COM9"; // for office PC
             //IIeee488Handler ieeeHandler = new GpibVisaHandler(gpibAddress);
             IIeee488Handler ieeeHandler = new GpibPrologixHandler(gpibAddress, comPort);
             IWavelengthConverter waveConverter = new WavelengthConverter(50.0, 0.0);

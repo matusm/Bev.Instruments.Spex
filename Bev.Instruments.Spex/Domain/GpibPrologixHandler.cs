@@ -11,6 +11,7 @@ namespace Bev.Instruments.Spex
 
         public GpibPrologixHandler(int deviceAddress, string serialPortname)
         {
+            serialPort = new SerialPort();  
             InitializeSerialPort(serialPortname);
             serialPort.Open();
             InitializePrologix(deviceAddress);
