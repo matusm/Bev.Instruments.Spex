@@ -89,8 +89,9 @@ namespace Bev.Instruments.Spex
             serialPort.WriteLine("++mode 1");    // controller
             serialPort.WriteLine($"++addr {deviceAddress}");    // instrument GPIB address
             serialPort.WriteLine("++auto 0");    // explicit reads
-            serialPort.WriteLine("++eos 0");     // no EOS translation
-            serialPort.WriteLine("++eoi 1");     // use EOI on GPIB writes
+            serialPort.WriteLine("++eos 3");     // no EOS translation
+            serialPort.WriteLine("++eoi 0");     // use EOI on GPIB writes
+            serialPort.WriteLine("++eot_enable 0");     // use EOI on GPIB writes
             Thread.Sleep(50);
         }
 
