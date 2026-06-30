@@ -31,13 +31,27 @@ namespace Bev.Instruments.Spex
         public byte[] ReadBytes()
         {
             serialPort.DiscardInBuffer();
-            serialPort.WriteLine("++read 256"); // request up to 256 bytes
+            serialPort.WriteLine("++read");
             Thread.Sleep(50);
-            byte[] buffer = new byte[1024];     // why not 256? 
-            int read = serialPort.BaseStream.Read(buffer, 0, buffer.Length); // reads raw bytes
-            byte[] result = new byte[read];
-            Array.Copy(buffer, result, read);
-            return result;
+            try 
+            {
+                byte[] buffer = new byte[1024];
+                int read = serialPort.Read(buffer, 0, buffer.Length); // reads raw bytes
+                Console.WriteLine(  "int read" + read);
+                byte[] result = new byte[read];
+                Array.Copy(buffer, result, read);
+                return result;
+            }
+            catch (TimeoutException)
+            {
+                Console.WriteLine("Timeout occurred while reading bytes.");
+                return new byte[0]; // return empty array on timeout
+            } 
+            catch (Exception e) 
+            {
+                Console.WriteLine($"Exception occurred while reading bytes: {e.Message}");
+                return new byte[0]; // return empty array on other exceptions
+            }
         }
 
         public void SendBytes(byte[] b)
@@ -67,7 +81,7 @@ namespace Bev.Instruments.Spex
             serialPort.ReadTimeout = 5000;
             serialPort.WriteTimeout = 2000;
             serialPort.NewLine = "\n";
-            serialPort.Encoding = Encoding.ASCII;
+            //serialPort.Encoding = Encoding.ASCII;
         }
 
         private void InitializePrologix(int deviceAddress)
