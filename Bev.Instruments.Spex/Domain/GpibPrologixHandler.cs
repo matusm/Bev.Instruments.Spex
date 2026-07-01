@@ -98,7 +98,7 @@ namespace Bev.Instruments.Spex
             // additional settings from ChatGPT code example
             //serialPort.ReadTimeout = 5000;
             //serialPort.WriteTimeout = 2000;
-            //serialPort.NewLine = "\n";
+            serialPort.NewLine = "\n";
             //serialPort.Encoding = Encoding.ASCII;
         }
 
@@ -108,8 +108,8 @@ namespace Bev.Instruments.Spex
             serialPort.WriteLine($"++addr {deviceAddress}");    // instrument GPIB address
             serialPort.WriteLine("++auto 0");    // explicit reads
             serialPort.WriteLine("++eos 3");     // no EOS translation
-            serialPort.WriteLine("++eoi 0");     // use EOI on GPIB writes
-            serialPort.WriteLine("++eot_enable 0");     // use EOI on GPIB writes
+            serialPort.WriteLine("++eoi 1");     // use EOI on GPIB writes
+            //serialPort.WriteLine("++eot_enable 0");     // use EOI on GPIB writes
             Thread.Sleep(50);
         }
 
