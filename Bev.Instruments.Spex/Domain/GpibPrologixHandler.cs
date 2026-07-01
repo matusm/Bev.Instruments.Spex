@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO.Ports;
 using System.Text;
 using System.Threading;
@@ -31,27 +32,44 @@ namespace Bev.Instruments.Spex
         public byte[] ReadBytes()
         {
             serialPort.DiscardInBuffer();
-            serialPort.WriteLine("++read");
+            serialPort.Write("++read" + "\r\n");
             Thread.Sleep(50);
-            try 
+            DateTime lastRead = DateTime.Now;
+            TimeSpan elapsedTime = new TimeSpan();
+            TimeSpan TIMEOUT = new TimeSpan(0, 0, 2);   // 2 second timespan
+            // Read from port until TIMEOUT time has elapsed since
+            // last successful read
+            List<byte> buffer = new List<byte>();
+            while (TIMEOUT.CompareTo(elapsedTime) > 0)
             {
-                byte[] buffer = new byte[1024];
-                int read = serialPort.Read(buffer, 0, buffer.Length); // reads raw bytes
-                Console.WriteLine(  "int read" + read);
-                byte[] result = new byte[read];
-                Array.Copy(buffer, result, read);
-                return result;
+                int b = serialPort.ReadByte();
+                if (b != -1)
+                {
+                    buffer.Add((byte)b);
+                    lastRead = DateTime.Now;
+                }
+                elapsedTime = DateTime.Now - lastRead;
             }
-            catch (TimeoutException)
-            {
-                Console.WriteLine("Timeout occurred while reading bytes.");
-                return new byte[0]; // return empty array on timeout
-            } 
-            catch (Exception e) 
-            {
-                Console.WriteLine($"Exception occurred while reading bytes: {e.Message}");
-                return new byte[0]; // return empty array on other exceptions
-            }
+            return buffer.ToArray();
+            //try
+            //{
+            //    byte[] buffer = new byte[1024];
+            //    int read = serialPort.Read(buffer, 0, buffer.Length); // reads raw bytes
+            //    Console.WriteLine(  "int read" + read);
+            //    byte[] result = new byte[read];
+            //    Array.Copy(buffer, result, read);
+            //    return result;
+            //}
+            //catch (TimeoutException)
+            //{
+            //    Console.WriteLine("Timeout occurred while reading bytes.");
+            //    return new byte[0]; // return empty array on timeout
+            //} 
+            //catch (Exception e) 
+            //{
+            //    Console.WriteLine($"Exception occurred while reading bytes: {e.Message}");
+            //    return new byte[0]; // return empty array on other exceptions
+            //}
         }
 
         public void SendBytes(byte[] b)
@@ -78,9 +96,9 @@ namespace Bev.Instruments.Spex
             serialPort.DiscardNull = false;
             serialPort.ParityReplace = 0;
             // additional settings from ChatGPT code example
-            serialPort.ReadTimeout = 5000;
-            serialPort.WriteTimeout = 2000;
-            serialPort.NewLine = "\n";
+            //serialPort.ReadTimeout = 5000;
+            //serialPort.WriteTimeout = 2000;
+            //serialPort.NewLine = "\n";
             //serialPort.Encoding = Encoding.ASCII;
         }
 
